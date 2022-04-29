@@ -1,2 +1,86 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+import argparse
+import math
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--principal", type=float)
+parser.add_argument("-m", "--payment", type=float)
+parser.add_argument("-i", "--interest", type=float)
+parser.add_argument("-e", "--periods", type=int)
+parser.add_argument("-t", "--type", type=str)
+args = parser.parse_args()
+
+
+def periods(principal_1, monthly_pay, interest_):
+
+    i = (((interest_) / (12 * 100)))
+    a = (monthly_pay / (monthly_pay - (i * principal_1)))
+    n = math.ceil(math.log(a, (1 + i)))
+    m = n / 12
+    year = n // 12
+    months = round(((m - year) * 12))
+    if year == 0 and months <= 12:
+        print('It will {} months to repay this loan!'.format(months))
+        x = round((months * monthly_pay) - principal_1)
+        print("Overpayment = {}".format(x))
+    elif m == 1 and months == 0:
+        print('It will take {} year to repay this loan!'.format(m))
+        y = round((12 * monthly_pay) - principal_1)
+        print("Overpayment = {}".format(y))
+    elif m >= 1 and months == 0:
+        print("It will take {} years to repay this loan!".format(round(m)))
+        q = round(((m * 12) * monthly_pay) - principal_1)
+        print("Overpayment = {}".format(q))
+    else:
+        print('It will take {} years and {} months to repay this loan!'.format(year, months))
+        z = ((year * 12) + months)
+        w = round((z * monthly_pay) - principal_1)
+        print("Overpayment = {}".format(w))
+
+
+def annuity(principal_2, period, interest_2):
+    j = (interest_2) / (12 * 100)
+    A = principal_2 * ((j * math.pow((1 + j), period)) / ((math.pow(1 + j, period)) - 1))
+    B = math.ceil(A)
+    over_pay = round((B * period) - principal_2)
+    print("Your annuity  payment = {}!".format(B))
+    print("Overpayment = {}".format(over_pay))
+
+
+def principal(annuity, period_, interest_3):
+    k = (((interest_3) / (12 * 100)))
+    j = (k * (math.pow(1 + k, period_))) / ((math.pow(1 + k, period_)) - 1)
+    P = math.floor((annuity / j))
+    over_pay__ = round((annuity * period_) - P)
+    print("Your loan principal = {}!".format(P))
+    print("Overpayment = {}".format(over_pay__))
+
+def diff():
+    m = 1
+    overpayment = []
+    for x in range(args.periods):
+
+        i = (((args.interest) / (12 * 100)))
+        D = (args.principal/args.periods) + (i * (args.principal-((args.principal * (m - 1)) / args.periods)))
+        e = math.ceil(D)
+        print("Month {}: payment is {}".format(m, e))
+        m +=1
+        f = e - (round(args.principal / args.periods))
+        overpayment.append(f)
+
+    b = sum(overpayment)
+    print("")
+    print("Overpayment = {}".format(b))
+
+
+try:
+    if args.periods == None and args.type == "annuity":
+        periods(args.principal, args.payment, args.interest)
+    elif args.payment == None and args.type == "annuity":
+        annuity(args.principal, args.periods, args.interest)
+    elif args.principal == None and args.type == "annuity":
+        principal(args.payment, args.periods, args.interest)
+    elif args.type == "diff":
+        diff()
+except TypeError:
+    print("Incorrect parameters")
+
